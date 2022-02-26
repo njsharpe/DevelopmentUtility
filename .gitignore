@@ -1,0 +1,37 @@
+# Compiled Classes
+*.class
+
+# Logs
+*.log
+
+# Packages
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Crashes
+hs_err_pid*
+
+# Gradle
+.gradle/
+!gradle-wrapper.jar
+
+# Builds
+build/
+
+# Idea
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Misc
+.metadata/
+bin/
+tmp/
+*.tmp
+*.bak
+local.properties
+.settings/
