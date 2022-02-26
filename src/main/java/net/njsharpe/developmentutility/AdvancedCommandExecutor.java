@@ -31,11 +31,16 @@ public class AdvancedCommandExecutor implements CommandExecutor {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if(!this.tree.getRoot().getKey().equals(command.getName())) return true;
-        if(args.length == 0) return this.tree.getRoot().execute(sender);
-        for(CommandTree.Command child : this.tree.getRoot().getChildren()) {
-            if(args[child.getDepth()].equals(child.getKey())) return child.execute(sender);
-        }
-        return true;
+        return this.run(this.tree.getRoot(), sender, command.getName(), args);
     }
+
+    private boolean run(CommandTree.Command root, CommandSender sender, String command, String[] args) {
+        if(!root.getKey().equals(command)) return true;
+        if(args.length == (root.getDepth() + 1)) return root.execute(sender);
+        for(CommandTree.Command child : root.getChildren()) {
+            if(args[child.getDepth()].equals(child.getKey())) return this.run(child, sender, child.getKey(), args);
+        }
+        return root.execute(sender);
+    }
+
 }

@@ -14,6 +14,10 @@ public class CommandTree {
 
     private final Command root;
 
+    public CommandTree(@NotNull String key) {
+        this(key, (sender) -> true, (sender) -> {});
+    }
+
     public CommandTree(@NotNull String key, @NotNull Function<CommandSender, Boolean> execute,
                        @NotNull Consumer<CommandSender> failure) {
         this.root = new Command(key, execute, failure);
@@ -23,11 +27,13 @@ public class CommandTree {
         return this.root;
     }
 
+    @Contract("_,_,_ -> new")
     public Command addCommand(@NotNull String key, @NotNull Function<CommandSender, Boolean> execute,
                                   @NotNull Consumer<CommandSender> failure) {
-        return this.addCommand(key, execute, failure, this.getRoot());
+        return this.addCommand(key, execute, failure, this.root);
     }
 
+    @Contract("_,_,_,_ -> new")
     public Command addCommand(@NotNull String key, @NotNull Function<CommandSender, Boolean> execute,
                                   @NotNull Consumer<CommandSender> failure, @Nullable Command parent) {
         return new Command(key, execute, failure, parent);
@@ -87,13 +93,6 @@ public class CommandTree {
             return this.children;
         }
 
-        @Contract("_,_,_ -> this")
-        public Command addChild(@NotNull String key, @NotNull Function<CommandSender, Boolean> execute,
-                                @NotNull Consumer<CommandSender> failure) {
-            Command child = new Command(key, execute, failure, this);
-            return this.addChild(child);
-        }
-
         @Contract("_ -> this")
         public Command addChild(@NotNull Command child) {
             child.setParent(this);
@@ -105,7 +104,7 @@ public class CommandTree {
             int i = -1;
             Command parent = this.parent;
             while(parent != null) {
-                parent = parent.getParent();
+                parent = parent.parent;
                 i++;
             }
             return i;
@@ -120,9 +119,9 @@ public class CommandTree {
         }
 
         public boolean execute(CommandSender sender) {
-            boolean failure = this.execute.apply(sender);
-            if(failure) this.failure.accept(sender);
-            return failure;
+            boolean success = this.execute.apply(sender);
+            if(!success) this.failure.accept(sender);
+            return success;
         }
 
     }
