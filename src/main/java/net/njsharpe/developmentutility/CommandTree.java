@@ -23,15 +23,14 @@ public class CommandTree {
         return this.root;
     }
 
-    public CommandTree addCommand(@NotNull String key, @NotNull Function<CommandSender, Boolean> execute,
+    public Command addCommand(@NotNull String key, @NotNull Function<CommandSender, Boolean> execute,
                                   @NotNull Consumer<CommandSender> failure) {
         return this.addCommand(key, execute, failure, this.getRoot());
     }
 
-    public CommandTree addCommand(@NotNull String key, @NotNull Function<CommandSender, Boolean> execute,
+    public Command addCommand(@NotNull String key, @NotNull Function<CommandSender, Boolean> execute,
                                   @NotNull Consumer<CommandSender> failure, @Nullable Command parent) {
-        Command command = new Command(key, execute, failure, parent);
-        return this;
+        return new Command(key, execute, failure, parent);
     }
 
     public static class Command {
