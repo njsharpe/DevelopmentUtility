@@ -69,7 +69,6 @@ public class CommandTree<V> {
         @Contract("_ -> this")
         public Command<K, V> setParent(@NotNull CommandTree.Command<K, V> parent) {
             this.parent = parent;
-            parent.addChild(this);
             return this;
         }
 
@@ -81,8 +80,7 @@ public class CommandTree<V> {
         @Contract("_,_ -> this")
         public Command<K, V> addChild(@NotNull K key, @Nullable V value) {
             Command<K, V> child = new Command<>(key, value, this);
-            this.children.add(child);
-            return this;
+            return this.addChild(child);
         }
 
         @Contract("_ -> this")
