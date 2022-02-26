@@ -6,16 +6,18 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.function.Consumer;
+
 public class AdvancedCommandExecutor implements CommandExecutor {
 
     private final Plugin plugin;
-    private final CommandTree<Runnable> tree;
+    private final CommandTree<Consumer<CommandSender>> tree;
 
     public AdvancedCommandExecutor(@NotNull Plugin plugin, @NotNull String command) {
-        this(plugin, new CommandTree<>(command, () -> {}));
+        this(plugin, new CommandTree<>(command, (s) -> {}));
     }
 
-    public AdvancedCommandExecutor(@NotNull Plugin plugin, @NotNull CommandTree<Runnable> tree) {
+    public AdvancedCommandExecutor(@NotNull Plugin plugin, @NotNull CommandTree<Consumer<CommandSender>> tree) {
         this.plugin = plugin;
         this.tree = tree;
     }
@@ -25,7 +27,7 @@ public class AdvancedCommandExecutor implements CommandExecutor {
         return this.plugin;
     }
 
-    public CommandTree<Runnable> getTree() {
+    public CommandTree<Consumer<CommandSender>> getTree() {
         return this.tree;
     }
 
@@ -36,7 +38,7 @@ public class AdvancedCommandExecutor implements CommandExecutor {
             System.out.println(child.getKey() + ", " + args[child.getDepth()]);
             if(child.getKey().equals(args[child.getDepth()])) {
                 if(child.getValue() == null) return;
-                child.getValue().run();
+                child.getValue().accept(sender);
             }
         });
         return true;

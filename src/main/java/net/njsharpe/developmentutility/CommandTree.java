@@ -20,7 +20,7 @@ public class CommandTree<V> {
     }
 
     public CommandTree<V> addCommand(@NotNull String key, @Nullable V value) {
-        return this.addCommand(key, value, null);
+        return this.addCommand(key, value, this.getRoot());
     }
 
     public CommandTree<V> addCommand(@NotNull String key, @Nullable V value, @Nullable Command<String, V> parent) {
