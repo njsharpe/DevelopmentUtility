@@ -34,8 +34,7 @@ public class AdvancedCommandExecutor implements CommandExecutor {
         if(!this.tree.getRoot().getKey().equals(command.getName())) return true;
         if(args.length == 0) return this.tree.getRoot().execute(sender);
         for(CommandTree.Command child : this.tree.getRoot().getChildren()) {
-            System.out.println(child.getDepth() + ", " + args.length);
-            return child.execute(sender);
+            if(args[child.getDepth()].equals(child.getKey())) return child.execute(sender);
         }
         return true;
     }

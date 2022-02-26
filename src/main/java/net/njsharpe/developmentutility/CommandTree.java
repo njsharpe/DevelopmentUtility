@@ -102,7 +102,7 @@ public class CommandTree {
         }
 
         public int getDepth() {
-            int i = 0;
+            int i = -1;
             Command parent = this.parent;
             while(parent != null) {
                 parent = parent.getParent();
