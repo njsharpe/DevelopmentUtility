@@ -1,90 +1,102 @@
 package net.njsharpe.developmentutility;
 
+import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
-public class CommandTree<V> {
+public class CommandTree {
 
-    private final Command<String, V> root;
+    private final Command root;
 
-    public CommandTree(@NotNull String key, @Nullable V value) {
-        this.root = new Command<>(key, value);
+    public CommandTree(@NotNull String key, @NotNull Function<CommandSender, Boolean> execute,
+                       @NotNull Consumer<CommandSender> failure) {
+        this.root = new Command(key, execute, failure);
     }
 
-    public Command<String, V> getRoot() {
+    public Command getRoot() {
         return this.root;
     }
 
-    public CommandTree<V> addCommand(@NotNull String key, @Nullable V value) {
-        return this.addCommand(key, value, this.getRoot());
+    public CommandTree addCommand(@NotNull String key, @NotNull Function<CommandSender, Boolean> execute,
+                                  @NotNull Consumer<CommandSender> failure) {
+        return this.addCommand(key, execute, failure, this.getRoot());
     }
 
-    public CommandTree<V> addCommand(@NotNull String key, @Nullable V value, @Nullable Command<String, V> parent) {
-        Command<String, V> command = new Command<>(key, value, parent);
-        return null;
+    public CommandTree addCommand(@NotNull String key, @NotNull Function<CommandSender, Boolean> execute,
+                                  @NotNull Consumer<CommandSender> failure, @Nullable Command parent) {
+        Command command = new Command(key, execute, failure, parent);
+        return this;
     }
 
-    public static class Command<K, V> {
+    public static class Command {
 
-        private final List<Command<K, V>> children;
-        private final K key;
-        private Command<K, V> parent;
-        private V value;
+        private final List<Command> children;
+        private final String key;
+        private final Function<CommandSender, Boolean> execute;
+        private final Consumer<CommandSender> failure;
+        private Command parent;
 
-        public Command(@NotNull K key, @Nullable V value) {
-            this(key, value, null);
+        public Command(@NotNull String key, @NotNull Function<CommandSender, Boolean> execute,
+                       @NotNull Consumer<CommandSender> failure) {
+            this(key, execute, failure, null);
         }
 
-        public Command(@NotNull K key, @Nullable V value, @Nullable Command<K, V> parent) {
+        public Command(@NotNull String key, @NotNull Function<CommandSender, Boolean> execute,
+                       @NotNull Consumer<CommandSender> failure, @Nullable Command parent) {
             this.key = key;
-            this.value = value;
+            this.execute = execute;
+            this.failure = failure;
             this.parent = parent;
             if(parent != null) parent.addChild(this);
             this.children = new ArrayList<>();
         }
 
         @NotNull
-        public K getKey() {
+        public String getKey() {
             return this.key;
         }
 
-        @Nullable
-        public V getValue() {
-            return this.value;
+        @NotNull
+        public Function<CommandSender, Boolean> getExecute() {
+            return this.execute;
         }
 
-        public void setValue(V value) {
-            this.value = value;
+        @NotNull
+        public Consumer<CommandSender> getFailure() {
+            return this.failure;
         }
 
         @Nullable
-        public CommandTree.Command<K, V> getParent() {
+        public Command getParent() {
             return this.parent;
         }
 
         @Contract("_ -> this")
-        public Command<K, V> setParent(@NotNull CommandTree.Command<K, V> parent) {
+        public Command setParent(@NotNull Command parent) {
             this.parent = parent;
             return this;
         }
 
         @NotNull
-        public List<Command<K, V>> getChildren() {
+        public List<Command> getChildren() {
             return this.children;
         }
 
-        @Contract("_,_ -> this")
-        public Command<K, V> addChild(@NotNull K key, @Nullable V value) {
-            Command<K, V> child = new Command<>(key, value, this);
+        @Contract("_,_,_ -> this")
+        public Command addChild(@NotNull String key, @NotNull Function<CommandSender, Boolean> execute,
+                                @NotNull Consumer<CommandSender> failure) {
+            Command child = new Command(key, execute, failure, this);
             return this.addChild(child);
         }
 
         @Contract("_ -> this")
-        public Command<K, V> addChild(@NotNull CommandTree.Command<K, V> child) {
+        public Command addChild(@NotNull Command child) {
             child.setParent(this);
             this.children.add(child);
             return this;
@@ -92,7 +104,7 @@ public class CommandTree<V> {
 
         public int getDepth() {
             int i = 0;
-            Command<K, V> parent = this.parent;
+            Command parent = this.parent;
             while(parent != null) {
                 parent = parent.getParent();
                 i++;
@@ -106,6 +118,12 @@ public class CommandTree<V> {
 
         public boolean isLeaf() {
             return (this.children.size() == 0);
+        }
+
+        public boolean execute(CommandSender sender) {
+            boolean failure = this.execute.apply(sender);
+            if(failure) this.failure.accept(sender);
+            return failure;
         }
 
     }

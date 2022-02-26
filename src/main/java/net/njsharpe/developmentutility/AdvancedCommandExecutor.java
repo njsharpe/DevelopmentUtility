@@ -6,18 +6,16 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.function.Consumer;
-
 public class AdvancedCommandExecutor implements CommandExecutor {
 
     private final Plugin plugin;
-    private final CommandTree<Consumer<CommandSender>> tree;
+    private final CommandTree tree;
 
     public AdvancedCommandExecutor(@NotNull Plugin plugin, @NotNull String command) {
-        this(plugin, new CommandTree<>(command, (s) -> {}));
+        this(plugin, new CommandTree(command, (s) -> true, (s) -> {}));
     }
 
-    public AdvancedCommandExecutor(@NotNull Plugin plugin, @NotNull CommandTree<Consumer<CommandSender>> tree) {
+    public AdvancedCommandExecutor(@NotNull Plugin plugin, @NotNull CommandTree tree) {
         this.plugin = plugin;
         this.tree = tree;
     }
@@ -27,20 +25,18 @@ public class AdvancedCommandExecutor implements CommandExecutor {
         return this.plugin;
     }
 
-    public CommandTree<Consumer<CommandSender>> getTree() {
+    public CommandTree getTree() {
         return this.tree;
     }
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if(!this.tree.getRoot().getKey().equals(command.getName())) return true;
-        this.tree.getRoot().getChildren().forEach(child -> {
-            System.out.println(child.getKey() + ", " + args[child.getDepth()]);
-            if(child.getKey().equals(args[child.getDepth()])) {
-                if(child.getValue() == null) return;
-                child.getValue().accept(sender);
-            }
-        });
+        if(args.length == 0) return this.tree.getRoot().execute(sender);
+        for(CommandTree.Command child : this.tree.getRoot().getChildren()) {
+            System.out.println(child.getDepth() + ", " + args.length);
+            return child.execute(sender);
+        }
         return true;
     }
 }
