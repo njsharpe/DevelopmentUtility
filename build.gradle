@@ -6,8 +6,8 @@ plugins {
 group 'net.njsharpe.developmentutility'
 version '1.0.0'
 
-targetCompatibility = '1.8'
-sourceCompatibility = '1.8'
+targetCompatibility = 1.8
+sourceCompatibility = 1.8
 
 task dev {
     dependsOn jar

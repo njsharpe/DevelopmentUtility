@@ -1,5 +1,6 @@
-package net.njsharpe.developmentutility;
+package net.njsharpe.developmentutility.math;
 
+import net.njsharpe.developmentutility.Maker;
 import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;

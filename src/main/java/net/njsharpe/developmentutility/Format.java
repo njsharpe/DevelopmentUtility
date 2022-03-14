@@ -1,7 +1,6 @@
 package net.njsharpe.developmentutility;
 
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

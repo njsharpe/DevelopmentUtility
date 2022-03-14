@@ -1,4 +1,4 @@
-package net.njsharpe.developmentutility;
+package net.njsharpe.developmentutility.command;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
