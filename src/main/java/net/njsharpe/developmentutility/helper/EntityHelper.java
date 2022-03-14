@@ -1,5 +1,6 @@
 package net.njsharpe.developmentutility.helper;
 
+import net.njsharpe.developmentutility.function.TriConsumer;
 import net.njsharpe.developmentutility.math.Algebra;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -16,7 +17,6 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
 
 import java.util.Random;
-import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
 public class EntityHelper {
@@ -101,7 +101,7 @@ public class EntityHelper {
 
     public static boolean teleport(@NotNull LivingEntity entity, @NotNull Random random,
                                    @Range(from = 0, to = 64) int distance,
-                                   @NotNull BiConsumer<Location, Location> success) {
+                                   @NotNull TriConsumer<World, Location, Location> success) {
         Location pos = entity.getLocation();
         double x = pos.getX() + (random.nextDouble() - 0.5D) * distance;
         double y = pos.getY() + (double)(random.nextInt(16) - distance);
@@ -110,7 +110,7 @@ public class EntityHelper {
     }
 
     public static boolean teleport(@NotNull LivingEntity entity, @NotNull Random random, double x, double y, double z,
-                                   @NotNull BiConsumer<Location, Location> success) {
+                                   @NotNull TriConsumer<World, Location, Location> success) {
         World world = entity.getWorld();
         Location pos = new Location(world, x, y, z);
         while(pos.getY() > world.getMinHeight() && !world.getBlockAt(pos).isPassable()) {
@@ -125,7 +125,7 @@ public class EntityHelper {
         if(teleport) {
             EntityTeleportEvent event = new EntityTeleportEvent(entity, old, pos);
             Bukkit.getServer().getPluginManager().callEvent(event);
-            success.accept(old, pos);
+            success.accept(world, old, pos);
         }
         return teleport;
     }
