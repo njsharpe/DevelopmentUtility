@@ -1,4 +1,4 @@
-package net.njsharpe.developmentutility.item;
+package net.njsharpe.developmentutility;
 
 import org.bukkit.GameMode;
 import org.bukkit.entity.Entity;

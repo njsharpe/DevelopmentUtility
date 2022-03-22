@@ -1,6 +1,6 @@
 package net.njsharpe.developmentutility.helper;
 
-import net.njsharpe.developmentutility.item.DamageSource;
+import net.njsharpe.developmentutility.DamageSource;
 import net.njsharpe.developmentutility.math.Algebra;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
