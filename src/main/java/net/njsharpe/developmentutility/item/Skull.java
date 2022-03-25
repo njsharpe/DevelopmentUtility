@@ -45,8 +45,9 @@ public class Skull extends AbstractItem {
         }
     }
 
+    @NotNull
     @Override
-    public @NotNull AbstractItem clone() {
+    public Skull clone() {
         return new Skull(this.getItem().clone());
     }
 
@@ -79,7 +80,7 @@ public class Skull extends AbstractItem {
         }
 
         @Override
-        public AbstractItem build() {
+        public Skull build() {
             ItemStack item = new ItemStack(this.material, this.amount);
             item.setItemMeta(this.create());
             return new Skull(item);

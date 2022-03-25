@@ -20,7 +20,7 @@ public class Book extends AbstractItem {
 
     @NotNull
     @Override
-    public AbstractItem clone() {
+    public Book clone() {
         return new Book(this.getItem().clone());
     }
 
@@ -91,7 +91,7 @@ public class Book extends AbstractItem {
         }
 
         @Override
-        public AbstractItem build() {
+        public Book build() {
             ItemStack item = new ItemStack(this.material, this.amount);
             item.setItemMeta(this.create());
             return new Book(item);

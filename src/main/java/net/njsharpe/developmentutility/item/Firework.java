@@ -20,8 +20,9 @@ public class Firework extends AbstractItem {
         super(item);
     }
 
+    @NotNull
     @Override
-    public @NotNull AbstractItem clone() {
+    public Firework clone() {
         return new Firework(this.getItem().clone());
     }
 
@@ -67,7 +68,7 @@ public class Firework extends AbstractItem {
         }
 
         @Override
-        public AbstractItem build() {
+        public Firework build() {
             ItemStack item = new ItemStack(this.material, this.amount);
             item.setItemMeta(this.create());
             return new Firework(item);

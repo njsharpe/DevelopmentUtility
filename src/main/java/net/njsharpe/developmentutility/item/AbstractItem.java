@@ -5,16 +5,19 @@ import net.njsharpe.developmentutility.Format;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public abstract class AbstractItem implements Cloneable {
 
@@ -52,17 +55,12 @@ public abstract class AbstractItem implements Cloneable {
 
     public static abstract class Builder {
 
-        protected final Map<Enchantment, Integer> enchantments = new HashMap<>();
-
         protected final Material material;
         protected final int amount;
+        private final ItemMeta meta;
 
-        protected String name;
-        protected List<String> lore;
-        protected short durability;
-        protected boolean unbreakable;
-        protected boolean glowing;
-        protected ItemFlag[] flags;
+        private final Map<Enchantment, Integer> enchantments = new HashMap<>();
+        private boolean glowing;
 
         public Builder(@NotNull Material material) {
             this(material, 1);
@@ -71,10 +69,12 @@ public abstract class AbstractItem implements Cloneable {
         public Builder(@NotNull Material material, @Range(from = 1, to = Integer.MAX_VALUE) int amount) {
             this.material = material;
             this.amount = amount;
+            this.meta = Objects.requireNonNull(Bukkit.getItemFactory().getItemMeta(material),
+                    String.format("meta null for type '%s'; illegal for builder", material));
         }
 
         public Builder setName(String name) {
-            this.name = name;
+            this.meta.setDisplayName(name);
             return this;
         }
 
@@ -87,22 +87,24 @@ public abstract class AbstractItem implements Cloneable {
         }
 
         public Builder setLore(List<String> lore) {
-            this.lore = lore;
+            this.meta.setLore(lore);
             return this;
         }
 
         public Builder setDurability(short durability) {
-            this.durability = durability;
+            if(durability < 0 || durability > this.material.getMaxDurability())
+                durability = this.material.getMaxDurability();
+            ((Damageable) this.meta).setDamage(durability);
             return this;
         }
 
         public Builder setUnbreakable() {
-            this.unbreakable = true;
+            this.meta.setUnbreakable(true);
             return this;
         }
 
         public Builder withFlags(ItemFlag... flags) {
-            this.flags = flags;
+            this.meta.addItemFlags(flags);
             return this;
         }
 
@@ -121,22 +123,18 @@ public abstract class AbstractItem implements Cloneable {
             return this;
         }
 
+        public <T, Z> Builder withTag(NamespacedKey key, PersistentDataType<T, Z> type, Z value) {
+            this.meta.getPersistentDataContainer().set(key, type, value);
+            return this;
+        }
+
         protected ItemMeta create() {
-            ItemMeta meta = Bukkit.getItemFactory().getItemMeta(this.material);
-            if(meta != null) {
-                meta.setDisplayName(this.name);
-                meta.setLore(this.lore);
-                meta.setUnbreakable(this.unbreakable);
-                Damageable damageable = (Damageable) meta;
-                if(this.durability <= this.material.getMaxDurability()) damageable.setDamage(this.durability);
-                if(this.enchantments.isEmpty() && this.glowing) {
-                    meta.addEnchant(Constants.DUMMY, 1, true);
-                } else {
-                    this.enchantments.forEach((k, v) -> meta.addEnchant(k, v, true));
-                    meta.addItemFlags(this.flags);
-                }
+            if(this.enchantments.isEmpty() && this.glowing) {
+                this.meta.addEnchant(Constants.DUMMY, 1, true);
+            } else {
+                this.enchantments.forEach((k, v) -> meta.addEnchant(k, v, true));
             }
-            return meta;
+            return this.meta;
         }
 
         public abstract AbstractItem build();

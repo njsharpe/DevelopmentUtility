@@ -24,7 +24,7 @@ public class Potion extends AbstractItem {
 
     @NotNull
     @Override
-    public AbstractItem clone() {
+    public Potion clone() {
         return new Potion(this.getItem().clone());
     }
 

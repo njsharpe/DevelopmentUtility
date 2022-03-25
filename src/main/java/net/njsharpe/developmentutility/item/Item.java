@@ -13,7 +13,7 @@ public class Item extends AbstractItem {
 
     @NotNull
     @Override
-    public AbstractItem clone() {
+    public Item clone() {
         return new Item(this.getItem().clone());
     }
 
