@@ -35,10 +35,35 @@ public class AdvancedCommandExecutor implements CommandExecutor {
     }
 
     private boolean run(CommandTree.Command root, CommandSender sender, String command, String[] args) {
-        if(!root.getKey().equals(command)) return true;
-        if(args.length == (root.getDepth() + 1)) return root.execute(sender);
+        if(root instanceof CommandTree.SingletonCommand) {
+            CommandTree.SingletonCommand singleton = (CommandTree.SingletonCommand) root;
+            if(!singleton.getCommand().equals(command)) return true;
+            if(args.length == (root.getDepth() + 1)) return root.execute(sender);
+            return this.child(root, sender, args);
+        }
+        if(root instanceof CommandTree.MultiCommand) {
+            CommandTree.MultiCommand multi = (CommandTree.MultiCommand) root;
+            if(!multi.getCommands().contains(command)) return true;
+            if(args.length == (root.getDepth() + 1)) return root.execute(sender);
+            return this.child(root, sender, args);
+        }
+        return root.execute(sender);
+    }
+
+    private boolean child(CommandTree.Command root, CommandSender sender, String[] args) {
         for(CommandTree.Command child : root.getChildren()) {
-            if(args[child.getDepth()].equals(child.getKey())) return this.run(child, sender, child.getKey(), args);
+            if(child instanceof CommandTree.SingletonCommand) {
+                CommandTree.SingletonCommand c = (CommandTree.SingletonCommand) child;
+                if(args[child.getDepth()].equals(c.getCommand()))
+                    return this.run(child, sender, c.getCommand(), args);
+            }
+            if(child instanceof CommandTree.MultiCommand) {
+                CommandTree.MultiCommand c = (CommandTree.MultiCommand) child;
+                for(String option : c.getCommands()) {
+                    if(args[child.getDepth()].equals(option)) return this.run(child, sender, option, args);
+                }
+                return true;
+            }
         }
         return root.execute(sender);
     }

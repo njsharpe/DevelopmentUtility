@@ -7,6 +7,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -93,7 +94,8 @@ public class Format {
     }
 
     /**
-     * Creates a {@link List} of {@link String}, splitting on the {@code regex} specified
+     * Creates a {@link List} of {@link String}, splitting on the {@code regex} specified. This method
+     * will ignore null inputs
      *
      * @param regex Regex pattern to split on
      * @param value Nullable {@link String}
@@ -103,12 +105,12 @@ public class Format {
     @Nullable
     public static List<String> toList(@NotNull String regex, @Nullable String value) {
         if(value == null) return null;
-        return Arrays.asList(value.split(regex));
+        return Arrays.stream(value.split(regex)).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
     /**
      * Transforms the input {@link String} to capitalize on the delimiters {@code `}, {@code '}, {@code -},
-     * {@code /}, {@code _} and {@code \s} whitespace characters.
+     * {@code /}, {@code _} and {@code \s} whitespace characters
      *
      * @param value Nullable {@link String}
      * @return The transformed {@link String}, or {@code null} if the input is null
