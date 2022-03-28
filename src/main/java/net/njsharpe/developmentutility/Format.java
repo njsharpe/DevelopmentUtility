@@ -7,7 +7,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -28,8 +27,7 @@ public class Format {
     }
 
     /**
-     * Transforms and formats the input {@link String} to use {@code &} for color code translation.
-     * This method will ignore null values in {@code args}
+     * Transforms and formats the input {@link String} to use {@code &} for color code translation
      *
      * @param value Nullable {@link String}
      * @param args A set of {@link Object} to format the input {@link String}
@@ -39,13 +37,11 @@ public class Format {
     @Nullable
     public static String colorize(@Nullable String value, Object... args) {
         if(value == null) return null;
-        Object[] objects = Arrays.stream(args).filter(Objects::nonNull).toArray(Object[]::new);
-        return colorize(String.format(value, objects));
+        return colorize(String.format(value, args));
     }
 
     /**
-     * Transforms the input {@link List} of {@link String} to use {@code &} for color code translation.
-     * This method will ignore null values in {@code values}
+     * Transforms the input {@link List} of {@link String} to use {@code &} for color code translation
      *
      * @param values Nullable {@link List} of {@link String}
      * @return The transformed {@link List} of {@link String}, or {@code null} if the input is null
@@ -54,7 +50,7 @@ public class Format {
     @Nullable
     public static List<String> colorize(@Nullable List<String> values) {
         if(values == null) return null;
-        return values.stream().filter(Objects::nonNull).map(Format::colorize).collect(Collectors.toList());
+        return values.stream().map(Format::colorize).collect(Collectors.toList());
     }
 
     /**
@@ -71,8 +67,7 @@ public class Format {
     }
 
     /**
-     * Transforms the input {@link List} of {@link String} to remove all instances of {@code U+00A7}.
-     * This method will ignore null values in {@code values}
+     * Transforms the input {@link List} of {@link String} to remove all instances of {@code U+00A7}
      *
      * @param values Nullable {@link List} of {@link String}
      * @return The transformed {@link List} of {@link String}, or {@code null} if the input is null
@@ -98,8 +93,7 @@ public class Format {
     }
 
     /**
-     * Creates a {@link List} of {@link String}, splitting on the {@code regex} specified.
-     * This method will ignore null values in {@code value} after splitting
+     * Creates a {@link List} of {@link String}, splitting on the {@code regex} specified
      *
      * @param regex Regex pattern to split on
      * @param value Nullable {@link String}
@@ -109,7 +103,7 @@ public class Format {
     @Nullable
     public static List<String> toList(@NotNull String regex, @Nullable String value) {
         if(value == null) return null;
-        return Arrays.stream(value.split(regex)).filter(Objects::nonNull).collect(Collectors.toList());
+        return Arrays.stream(value.split(regex)).collect(Collectors.toList());
     }
 
     /**
