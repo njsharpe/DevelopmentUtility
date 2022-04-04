@@ -2,10 +2,12 @@ package net.njsharpe.developmentutility.item;
 
 import net.njsharpe.developmentutility.Constants;
 import net.njsharpe.developmentutility.Format;
+import net.njsharpe.developmentutility.ObservableString;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.Damageable;
@@ -14,10 +16,9 @@ import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 
 public abstract class AbstractItem implements Cloneable {
 
@@ -57,9 +58,10 @@ public abstract class AbstractItem implements Cloneable {
 
         protected final Material material;
         protected final int amount;
-        private final ItemMeta meta;
+        private ItemMeta meta;
 
-        private final Map<Enchantment, Integer> enchantments = new HashMap<>();
+        private final Map<Enchantment, Integer> enchantments;
+        private List<String> lore;
         private boolean glowing;
 
         public Builder(@NotNull Material material) {
@@ -67,10 +69,18 @@ public abstract class AbstractItem implements Cloneable {
         }
 
         public Builder(@NotNull Material material, @Range(from = 1, to = Integer.MAX_VALUE) int amount) {
+            this(material, amount, Objects.requireNonNull(Bukkit.getItemFactory().getItemMeta(material),
+                    String.format("meta null for type '%s'; illegal for builder", material)));
+        }
+
+        protected Builder(@NotNull Material material, @Range(from = 1, to = Integer.MAX_VALUE) int amount,
+                          @NotNull ItemMeta meta) {
             this.material = material;
             this.amount = amount;
-            this.meta = Objects.requireNonNull(Bukkit.getItemFactory().getItemMeta(material),
-                    String.format("meta null for type '%s'; illegal for builder", material));
+            this.meta = meta;
+            this.enchantments = meta.getEnchants();
+            this.lore = meta.getLore() == null ? new ArrayList<>() : meta.getLore();
+            this.glowing = this.enchantments.containsKey(Constants.DUMMY);
         }
 
         public Builder setName(String name) {
@@ -78,16 +88,43 @@ public abstract class AbstractItem implements Cloneable {
             return this;
         }
 
-        public Builder setLore(String lore) {
-            return this.setLore(lore, "\\|");
+        public Builder appendLore(String line) {
+            this.lore.add(line);
+            return this;
+        }
+
+        public Builder appendLore(Iterable<String> lore) {
+            if(this.lore.isEmpty()) {
+                return this.setLore(lore);
+            }
+            lore.forEach(this::appendLore);
+            return this;
+        }
+
+        public Builder appendLore(ObservableString lore) {
+            this.lore.add(lore.toString());
+            return this;
         }
 
         public Builder setLore(String lore, String delimiter) {
             return this.setLore(Format.toList(lore, delimiter));
         }
 
-        public Builder setLore(List<String> lore) {
-            this.meta.setLore(lore);
+        public Builder setLore(Iterable<String> lore) {
+            List<String> list = new ArrayList<>();
+            lore.iterator().forEachRemaining(list::add);
+            this.lore = list;
+            return this;
+        }
+
+        public Builder insertLore(int index, String lore) {
+            this.lore.set(index, lore);
+            return this;
+        }
+
+        public Builder insertLore(int index, Iterable<String> lore) {
+            AtomicInteger atomic = new AtomicInteger(index);
+            lore.forEach(line -> this.lore.set(atomic.getAndIncrement(), line));
             return this;
         }
 
@@ -128,11 +165,31 @@ public abstract class AbstractItem implements Cloneable {
             return this;
         }
 
+        public Builder withCustomModelData(int data) {
+            this.meta.setCustomModelData(data);
+            return this;
+        }
+
+        public Builder and(Supplier<ItemMeta> supplier) {
+            ItemMeta meta = supplier.get();
+            if(Bukkit.getItemFactory().isApplicable(meta, this.material)) {
+                this.meta = this.combine(this.meta, supplier.get());
+            }
+            return this;
+        }
+
+        private ItemMeta combine(ItemMeta host, ItemMeta remote) {
+            Map<String, Object> map = new HashMap<>(host.serialize());
+            new HashMap<>(remote.serialize()).forEach((k, v) -> map.merge(k, v, (x, y) -> x));
+            return (ItemMeta) ConfigurationSerialization.deserializeObject(map, ItemMeta.class);
+        }
+
         protected ItemMeta create() {
+            this.meta.setLore(this.lore);
             if(this.enchantments.isEmpty() && this.glowing) {
                 this.meta.addEnchant(Constants.DUMMY, 1, true);
             } else {
-                this.enchantments.forEach((k, v) -> meta.addEnchant(k, v, true));
+                this.enchantments.forEach((k, v) -> this.meta.addEnchant(k, v, true));
             }
             return this.meta;
         }
