@@ -15,6 +15,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class Potion extends AbstractItem {
 
@@ -48,6 +50,15 @@ public class Potion extends AbstractItem {
                     Material.POTION, Material.LINGERING_POTION, Material.SPLASH_POTION
             })) throw new IllegalArgumentException(String.format("material '%s' is not allowed for this type",
                     material));
+        }
+
+        private Builder(@NotNull ItemStack item) {
+            super(item.getType(), item.getAmount(), Optional.ofNullable(item.getItemMeta())
+                    .orElseThrow(IllegalArgumentException::new));
+            this.data = ((PotionMeta) item.getItemMeta()).getBasePotionData();
+            this.effects = ((PotionMeta) item.getItemMeta()).getCustomEffects().stream()
+                    .collect(Collectors.toMap(k -> k, v -> true));
+            this.color = ((PotionMeta) item.getItemMeta()).getColor();
         }
 
         public Builder withEffect(PotionEffectType type, int duration, int amplifier) {
@@ -103,6 +114,10 @@ public class Potion extends AbstractItem {
             ItemStack item = new ItemStack(this.material, this.amount);
             item.setItemMeta(this.create());
             return new Potion(item);
+        }
+
+        public static Potion.Builder rebuild(@NotNull ItemStack item) {
+            return new Potion.Builder(item);
         }
 
     }

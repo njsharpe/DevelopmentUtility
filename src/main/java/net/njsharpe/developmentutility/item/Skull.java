@@ -13,6 +13,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public class Skull extends AbstractItem {
@@ -63,6 +64,12 @@ public class Skull extends AbstractItem {
             super(Material.PLAYER_HEAD, amount);
         }
 
+        private Builder(@NotNull ItemStack item) {
+            super(item.getType(), item.getAmount(), Optional.ofNullable(item.getItemMeta())
+                    .orElseThrow(IllegalArgumentException::new));
+            this.player = ((SkullMeta) item.getItemMeta()).getOwningPlayer();
+        }
+
         public Builder forPlayer(UUID uuid) {
             return this.forPlayer(Bukkit.getOfflinePlayer(uuid));
         }
@@ -85,6 +92,11 @@ public class Skull extends AbstractItem {
             item.setItemMeta(this.create());
             return new Skull(item);
         }
+
+        public static Skull.Builder rebuild(@NotNull ItemStack item) {
+            return new Skull.Builder(item);
+        }
+
     }
 
 }

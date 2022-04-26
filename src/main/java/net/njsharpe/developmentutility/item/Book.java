@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Range;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 public class Book extends AbstractItem {
 
@@ -43,6 +44,15 @@ public class Book extends AbstractItem {
             if(title != null && title.length() > 32)
                 throw new IllegalArgumentException("title cannot be longer than 32 characters");
             this.title = title;
+        }
+
+        private Builder(@NotNull ItemStack item) {
+            super(item.getType(), item.getAmount(), Optional.ofNullable(item.getItemMeta())
+                    .orElseThrow(IllegalArgumentException::new));
+            this.title = ((BookMeta) item.getItemMeta()).getTitle();
+            this.author = ((BookMeta) item.getItemMeta()).getAuthor();
+            this.pages = ((BookMeta) item.getItemMeta()).getPages();
+            this.generation = ((BookMeta) item.getItemMeta()).getGeneration();
         }
 
         public Builder forGeneration(BookMeta.Generation generation) {
@@ -95,6 +105,10 @@ public class Book extends AbstractItem {
             ItemStack item = new ItemStack(this.material, this.amount);
             item.setItemMeta(this.create());
             return new Book(item);
+        }
+
+        public static Book.Builder rebuild(@NotNull ItemStack item) {
+            return new Book.Builder(item);
         }
 
     }

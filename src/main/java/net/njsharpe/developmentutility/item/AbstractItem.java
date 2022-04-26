@@ -2,7 +2,6 @@ package net.njsharpe.developmentutility.item;
 
 import net.njsharpe.developmentutility.Constants;
 import net.njsharpe.developmentutility.Format;
-import net.njsharpe.developmentutility.ObservableString;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -101,11 +100,6 @@ public abstract class AbstractItem implements Cloneable {
             return this;
         }
 
-        public Builder appendLore(ObservableString lore) {
-            this.lore.add(lore.toString());
-            return this;
-        }
-
         public Builder setLore(String lore, String delimiter) {
             return this.setLore(Format.toList(lore, delimiter));
         }
@@ -117,14 +111,25 @@ public abstract class AbstractItem implements Cloneable {
             return this;
         }
 
-        public Builder insertLore(int index, String lore) {
-            this.lore.set(index, lore);
+        public Builder appendLoreAt(int index, String lore) {
+            this.lore.add(index, lore);
             return this;
         }
 
-        public Builder insertLore(int index, Iterable<String> lore) {
+        public Builder appendLoreAt(int index, Iterable<String> lore) {
             AtomicInteger atomic = new AtomicInteger(index);
-            lore.forEach(line -> this.lore.set(atomic.getAndIncrement(), line));
+            lore.forEach(line -> this.lore.add(atomic.getAndIncrement(), line));
+            return this;
+        }
+
+        public Builder setLoreAt(int index, String lore, String delimiter) {
+            return this.setLoreAt(index, Format.toList(lore, delimiter));
+        }
+
+        public Builder setLoreAt(int index, Iterable<String> lore) {
+            List<String> list = new ArrayList<>();
+            lore.iterator().forEachRemaining(list::add);
+            this.lore.addAll(index, list);
             return this;
         }
 
