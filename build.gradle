@@ -10,26 +10,6 @@ version '1.0.0'
 targetCompatibility = 1.8
 sourceCompatibility = 1.8
 
-task dev {
-    dependsOn jar
-    doLast {
-        copy {
-            from "build/libs/${rootProject.name}.jar"
-            into project.properties['development.snapshots_dir']
-        }
-    }
-}
-
-task prod {
-    dependsOn jar
-    doLast {
-        copy {
-            from "build/libs/${rootProject.name}.jar"
-            into project.properties['production.releases_dir']
-        }
-    }
-}
-
 jar {
     archiveFileName = "${rootProject.name}.jar"
     archiveVersion = null
@@ -37,12 +17,14 @@ jar {
 
 repositories {
     mavenCentral()
+    mavenLocal()
     maven { url = 'https://oss.sonatype.org/repositories/snapshots/' }
     maven { url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
 }
 
 dependencies {
-    compileOnly 'org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT'
+    compileOnly 'org.spigotmc:spigot-api:1.18.2-R0.1-SNAPSHOT'
+    compileOnly 'org.spigotmc:spigot:1.18.2-R0.1-SNAPSHOT'
     implementation 'org.jetbrains:annotations:22.0.0'
 }
 

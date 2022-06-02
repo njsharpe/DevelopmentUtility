@@ -139,4 +139,16 @@ public class ItemHelper {
         return item == null || item.getType().isAir() || item.getAmount() == 0;
     }
 
+    @NotNull
+    public static ItemStack grow(@NotNull ItemStack item, int amount) {
+        item.setAmount(Math.min(item.getAmount() + amount, item.getType().getMaxStackSize()));
+        return item;
+    }
+
+    @NotNull
+    public static ItemStack shrink(@NotNull ItemStack item, int amount) {
+        item.setAmount(Math.max(0, item.getAmount() - amount));
+        return item;
+    }
+
 }

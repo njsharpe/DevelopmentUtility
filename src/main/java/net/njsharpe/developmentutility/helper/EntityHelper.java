@@ -6,17 +6,20 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.entity.EntityTeleportEvent;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.BoundingBox;
+import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
 
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class EntityHelper {
@@ -106,10 +109,10 @@ public class EntityHelper {
         double x = pos.getX() + (random.nextDouble() - 0.5D) * distance;
         double y = pos.getY() + (double)(random.nextInt(16) - distance);
         double z = pos.getZ() + (random.nextDouble() - 0.5D) * distance;
-        return EntityHelper.teleport(entity, random, x, y, z, success);
+        return EntityHelper.teleport(entity, x, y, z, success);
     }
 
-    public static boolean teleport(@NotNull LivingEntity entity, @NotNull Random random, double x, double y, double z,
+    public static boolean teleport(@NotNull LivingEntity entity, double x, double y, double z,
                                    @NotNull TriConsumer<World, Location, Location> success) {
         World world = entity.getWorld();
         Location pos = new Location(world, x, y, z);
@@ -230,6 +233,57 @@ public class EntityHelper {
             dy = 0.4000000059604645D;
         }
         entity.setVelocity(new Vector(dx, dy, dz));
+    }
+
+    public static Entity getLookingAt(@NotNull LivingEntity entity, @Nullable Entity target, double radius) {
+        return EntityHelper.getLookingAt(entity, target, radius, false);
+    }
+
+    public static Entity getLookingAt(@NotNull LivingEntity entity, @Nullable Entity target, double radius,
+                                      boolean ignoreBlocks) {
+        return EntityHelper.getLookingAt(entity, radius, ignoreBlocks, e -> e.equals(target));
+    }
+
+    public static Entity getLookingAt(@NotNull LivingEntity entity, @NotNull EntityType type, double radius) {
+        return EntityHelper.getLookingAt(entity, type, radius, false);
+    }
+
+    public static Entity getLookingAt(@NotNull LivingEntity entity, @NotNull EntityType type, double radius,
+                                          boolean ignoreBlocks) {
+        return EntityHelper.getLookingAt(entity, radius, ignoreBlocks, e -> e.getType().equals(type));
+    }
+
+    public static Entity getLookingAt(@NotNull LivingEntity entity, double radius) {
+        return EntityHelper.getLookingAt(entity, radius, false);
+    }
+
+    public static Entity getLookingAt(@NotNull LivingEntity entity, double radius, boolean ignoreBlocks) {
+        return EntityHelper.getLookingAt(entity, radius, ignoreBlocks, e -> true);
+    }
+
+    private static Entity getLookingAt(@NotNull LivingEntity entity, double radius, boolean ignoreBlocks,
+                                       @NotNull Predicate<Entity> predicate) {
+        Location location = entity.getEyeLocation().add(entity.getEyeLocation().getDirection());
+        if(ignoreBlocks) {
+            final RayTraceResult result = entity.getWorld().rayTraceEntities(location, location.getDirection(), radius);
+            if(result == null) return null;
+            return predicate.test(result.getHitEntity()) ? result.getHitEntity() : null;
+        }
+        final RayTraceResult result = entity.getWorld().rayTrace(location, location.getDirection(), radius,
+                FluidCollisionMode.NEVER, true, 0.5D, predicate);
+        if(result == null) return null;
+        return result.getHitEntity();
+    }
+
+    public static <T, U, V> boolean tryGet(@NotNull Entity entity, @NotNull NamespacedKey key,
+                                        @NotNull PersistentDataType<T, U> type, @NotNull AtomicReference<V> ref,
+                                        @NotNull Function<U, V> function) {
+        PersistentDataContainer container = entity.getPersistentDataContainer();
+        if(container.has(key, type) && container.get(key, type) != null) {
+            ref.set(function.apply(container.get(key, type)));
+            return true;
+        }
+        return false;
     }
 
 }

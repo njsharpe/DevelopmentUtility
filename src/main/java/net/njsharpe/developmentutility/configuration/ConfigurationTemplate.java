@@ -1,4 +1,4 @@
-package net.njsharpe.developmentutility.file;
+package net.njsharpe.developmentutility.configuration;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -7,7 +7,7 @@ import org.bukkit.plugin.Plugin;
 import java.io.File;
 import java.io.IOException;
 
-public class ConfigurationFile {
+public class ConfigurationTemplate {
 
     private final Plugin plugin;
     private final String name;
@@ -15,7 +15,7 @@ public class ConfigurationFile {
     private final File file;
     private FileConfiguration config;
 
-    public ConfigurationFile(Plugin plugin, String name) {
+    public ConfigurationTemplate(Plugin plugin, String name) {
         this.plugin = plugin;
         this.name = name;
         if(!plugin.getDataFolder().exists()) {
