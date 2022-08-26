@@ -59,8 +59,7 @@ public class ItemHelper {
     }
 
     public static void hurtArmor(@NotNull EntityEquipment inventory, @NotNull DamageSource cause, float f, int[] array) {
-        if(!(inventory.getHolder() instanceof Player)) return;
-        Player player = (Player) inventory.getHolder();
+        if(!(inventory.getHolder() instanceof Player player)) return;
         if(f <= 0.0F) return;
         if((f /= 4.0F) < 1.0F) f = 1.0F;
         for(int n : array) {

@@ -1,5 +1,6 @@
 package net.njsharpe.developmentutility.helper;
 
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.UUID;
 
@@ -14,9 +15,24 @@ public class UUIDHelper {
     }
 
     public static UUID toUUID(int[] array) {
-        if(array.length != 4) throw new IllegalArgumentException("invalid array size");
+        if(array.length != 4) throw new IllegalArgumentException("invalid int array size");
         long most = ((long) array[0] << 32) + (array[1]);
         long least = ((long) array[2] << 32) + (array[3]);
+        return new UUID(most, least);
+    }
+
+    public static byte[] toBytes(UUID uuid) {
+        ByteBuffer buffer = ByteBuffer.wrap(new byte[16]);
+        buffer.putLong(uuid.getMostSignificantBits());
+        buffer.putLong(uuid.getLeastSignificantBits());
+        return buffer.array();
+    }
+
+    public static UUID toUUID(byte[] bytes) {
+        if(bytes.length != 16) throw new IllegalArgumentException("invalid byte array size");
+        ByteBuffer buffer = ByteBuffer.wrap(bytes);
+        long most = buffer.getLong();
+        long least = buffer.getLong();
         return new UUID(most, least);
     }
 

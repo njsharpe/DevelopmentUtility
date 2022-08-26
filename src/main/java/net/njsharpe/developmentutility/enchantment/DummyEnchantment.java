@@ -11,12 +11,12 @@ import java.util.Optional;
 
 public class DummyEnchantment extends Enchantment {
 
-    private static final NamespacedKey KEY = NamespacedKey.fromString(String.format("%s:dummy", NamespacedKey.BUKKIT));
+    private static final NamespacedKey KEY = NamespacedKey.fromString("%s:dummy".formatted(NamespacedKey.BUKKIT));
 
     public DummyEnchantment() {
         super(Optional.ofNullable(KEY).orElseThrow(() ->
-            new IllegalArgumentException(String.format("could not create key %s for enchantment",
-                    String.format("%s:dummy", NamespacedKey.BUKKIT)))
+            new IllegalArgumentException("could not create key %s for enchantment".formatted(
+                    "%s:dummy".formatted(NamespacedKey.BUKKIT)))
         ));
     }
 

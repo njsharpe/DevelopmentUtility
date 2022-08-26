@@ -53,6 +53,10 @@ public abstract class AbstractItem implements Cloneable {
     @Override
     public abstract AbstractItem clone();
 
+    public ConcurrentItemModifier modify() {
+        return ConcurrentItemModifier.modify(this.item);
+    }
+
     public static abstract class Builder {
 
         protected final Material material;
