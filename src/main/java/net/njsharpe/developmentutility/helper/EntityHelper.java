@@ -63,8 +63,7 @@ public class EntityHelper {
     }
 
     public static boolean isSpectator(@NotNull Entity entity) {
-        if(!(entity instanceof Player)) return false;
-        Player player = (Player) entity;
+        if(!(entity instanceof Player player)) return false;
         return player.getGameMode().equals(GameMode.SPECTATOR);
     }
 

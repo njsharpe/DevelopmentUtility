@@ -1,14 +1,13 @@
 plugins {
     id 'java'
     id 'idea'
-    id 'maven-publish'
 }
 
-group 'net.njsharpe.developmentutility'
+group 'net.njsharpe'
 version '1.0.0'
 
-targetCompatibility = 1.8
-sourceCompatibility = 1.8
+targetCompatibility = 17
+sourceCompatibility = 17
 
 jar {
     archiveFileName = "${rootProject.name}.jar"
@@ -22,14 +21,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'org.spigotmc:spigot-api:1.18.1-R0.1-SNAPSHOT'
+    compileOnly 'org.spigotmc:spigot-api:1.19.2-R0.1-SNAPSHOT'
+    implementation 'org.apache.commons:commons-lang3:3.12.0'
     implementation 'org.jetbrains:annotations:23.0.0'
-}
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-        }
-    }
 }
