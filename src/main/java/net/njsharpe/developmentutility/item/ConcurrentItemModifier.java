@@ -125,8 +125,8 @@ public class ConcurrentItemModifier {
 
     public ConcurrentItemModifier appendDynamicLore(String lore, Serializable... values) {
         StringBuilder builder = new StringBuilder();
-        Pattern pattern = Pattern.compile(lore);
-        Matcher matcher = pattern.matcher("\\{\\d\\}");
+        Pattern pattern = Pattern.compile("(\\{\\d})");
+        Matcher matcher = pattern.matcher(lore);
 
         while(matcher.find()) {
             int i = Integer.parseInt(StringHelper.trimEnds(matcher.group()));
