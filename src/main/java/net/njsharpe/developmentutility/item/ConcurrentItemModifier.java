@@ -133,32 +133,6 @@ public class ConcurrentItemModifier {
         return this;
     }
 
-    public ConcurrentItemModifier appendDynamicLore(String lore, Serializable... values) {
-        StringBuilder builder = new StringBuilder();
-        Pattern pattern = Pattern.compile("(\\{\\d})");
-        Matcher matcher = pattern.matcher(lore);
-
-        while(matcher.find()) {
-            int i = Integer.parseInt(StringHelper.trimEnds(matcher.group()));
-            if(i < 0 || i > values.length - 1) {
-                throw new IndexOutOfBoundsException("integer found but out of bounds: %s of %s"
-                        .formatted(i, values.length));
-            }
-            NamespacedKey key = NamespacedKey.fromString("%s:dynamic_lore_%s".formatted(NamespacedKey.BUKKIT, i));
-            if(key == null) {
-                throw new RuntimeException("could not create key %s:dynamic_lore_%s".formatted(NamespacedKey.BUKKIT, i));
-            }
-            matcher.appendReplacement(builder, String.valueOf(values[i]));
-            this.meta.getPersistentDataContainer().set(key, new ObjectTagType(), values[i]);
-        }
-
-        matcher.appendTail(builder);
-        this.lore.add(builder.toString());
-        this.meta.setLore(this.lore);
-        this.item.setItemMeta(this.meta);
-        return this;
-    }
-
     public ConcurrentItemModifier setDurability(short durability) {
         if(durability < 0 || durability > this.item.getType().getMaxDurability())
             durability = this.item.getType().getMaxDurability();
