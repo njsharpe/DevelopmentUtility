@@ -48,17 +48,20 @@ public class ConcurrentItemModifier {
 
     public ConcurrentItemModifier setName(String name) {
         this.meta.setDisplayName(name);
+        this.item.setItemMeta(this.meta);
         return this;
     }
 
     public ConcurrentItemModifier setAmount(int amount) {
         this.item.setAmount(amount);
+        this.item.setItemMeta(this.meta);
         return this;
     }
 
     public ConcurrentItemModifier appendLore(String line) {
         this.lore.add(line);
         this.meta.setLore(this.lore);
+        this.item.setItemMeta(this.meta);
         return this;
     }
 
@@ -68,6 +71,7 @@ public class ConcurrentItemModifier {
         }
         this.lore.addAll(Arrays.asList(lore));
         this.meta.setLore(this.lore);
+        this.item.setItemMeta(this.meta);
         return this;
     }
 
@@ -77,6 +81,7 @@ public class ConcurrentItemModifier {
         }
         lore.forEach(this::appendLore);
         this.meta.setLore(this.lore);
+        this.item.setItemMeta(this.meta);
         return this;
     }
 
@@ -87,6 +92,7 @@ public class ConcurrentItemModifier {
     public ConcurrentItemModifier setLore(String... lore) {
         this.lore = new ArrayList<>(Arrays.asList(lore));
         this.meta.setLore(this.lore);
+        this.item.setItemMeta(this.meta);
         return this;
     }
 
@@ -95,12 +101,14 @@ public class ConcurrentItemModifier {
         lore.iterator().forEachRemaining(list::add);
         this.lore = list;
         this.meta.setLore(this.lore);
+        this.item.setItemMeta(this.meta);
         return this;
     }
 
     public ConcurrentItemModifier appendLoreAt(int index, String lore) {
         this.lore.add(index, lore);
         this.meta.setLore(this.lore);
+        this.item.setItemMeta(this.meta);
         return this;
     }
 
@@ -108,6 +116,7 @@ public class ConcurrentItemModifier {
         AtomicInteger atomic = new AtomicInteger(index);
         lore.forEach(line -> this.lore.add(atomic.getAndIncrement(), line));
         this.meta.setLore(this.lore);
+        this.item.setItemMeta(this.meta);
         return this;
     }
 
@@ -120,6 +129,7 @@ public class ConcurrentItemModifier {
         lore.iterator().forEachRemaining(list::add);
         this.lore.addAll(index, list);
         this.meta.setLore(this.lore);
+        this.item.setItemMeta(this.meta);
         return this;
     }
 
@@ -145,6 +155,7 @@ public class ConcurrentItemModifier {
         matcher.appendTail(builder);
         this.lore.add(builder.toString());
         this.meta.setLore(this.lore);
+        this.item.setItemMeta(this.meta);
         return this;
     }
 
@@ -152,31 +163,37 @@ public class ConcurrentItemModifier {
         if(durability < 0 || durability > this.item.getType().getMaxDurability())
             durability = this.item.getType().getMaxDurability();
         ((Damageable) this.meta).setDamage(durability);
+        this.item.setItemMeta(this.meta);
         return this;
     }
 
     public ConcurrentItemModifier setUnbreakable() {
         this.meta.setUnbreakable(true);
+        this.item.setItemMeta(this.meta);
         return this;
     }
 
     public ConcurrentItemModifier withFlags(ItemFlag... flags) {
         this.meta.addItemFlags(flags);
+        this.item.setItemMeta(this.meta);
         return this;
     }
 
     public ConcurrentItemModifier addEnchantment(Enchantment enchantment, int level) {
         this.meta.addEnchant(enchantment, level, true);
+        this.item.setItemMeta(this.meta);
         return this;
     }
 
     public <T, Z> ConcurrentItemModifier addTag(NamespacedKey key, PersistentDataType<T, Z> type, Z value) {
         this.meta.getPersistentDataContainer().set(key, type, value);
+        this.item.setItemMeta(this.meta);
         return this;
     }
 
     public ConcurrentItemModifier withCustomModelData(int data) {
         this.meta.setCustomModelData(data);
+        this.item.setItemMeta(this.meta);
         return this;
     }
 
