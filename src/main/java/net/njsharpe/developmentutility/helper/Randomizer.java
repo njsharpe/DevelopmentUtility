@@ -8,12 +8,12 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Random;
 
-public class RandomHelper {
+public class Randomizer {
 
     public static int nextIntInclusive(@NotNull Random random, @Range(from = 0, to = Integer.MAX_VALUE) int min,
                                        @Range(from = 0, to = Integer.MAX_VALUE) int max) {
         if(min == max) return min;
-        if(max < min) throw new IllegalStateException("max cannot be greater than min");
+        if(max < min) throw new IllegalStateException("Max cannot be greater than min");
         return random.nextInt((max - min) + 1) + min;
     }
 
@@ -27,7 +27,7 @@ public class RandomHelper {
             if(i == choice) return iterator.next();
             i++;
         }
-        throw new IllegalStateException(String.format("rolled %s into max of %s", choice, collection.size()));
+        throw new IllegalStateException(String.format("Rolled %s into max of %s", choice, collection.size()));
     }
 
     @Nullable
@@ -37,7 +37,7 @@ public class RandomHelper {
         for(int i = 0; i < array.length; i++) {
             if(i == choice) return array[i];
         }
-        throw new IllegalStateException(String.format("rolled %s into max of %s", choice, array.length));
+        throw new IllegalStateException(String.format("Rolled %s into max of %s", choice, array.length));
     }
 
 }

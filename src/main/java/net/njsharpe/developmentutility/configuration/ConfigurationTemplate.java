@@ -1,32 +1,40 @@
 package net.njsharpe.developmentutility.configuration;
 
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Logger;
 
-public class ConfigurationTemplate {
+public abstract class ConfigurationTemplate {
 
-    private final Plugin plugin;
+    private static final Logger LOG = Bukkit.getLogger();
+
     private final String name;
 
     private final File file;
     private FileConfiguration config;
 
     public ConfigurationTemplate(Plugin plugin, String name) {
-        this.plugin = plugin;
         this.name = name;
         if(!plugin.getDataFolder().exists()) {
-            plugin.getDataFolder().mkdirs();
+            boolean mkdirs = plugin.getDataFolder().mkdirs();
+            if(!mkdirs) {
+                throw new IllegalArgumentException("Could not create required directories for configuration file!");
+            }
         }
         this.file = new File(plugin.getDataFolder(), name);
         if(!this.file.exists()) {
             try {
-                this.file.createNewFile();
+                boolean createFile = this.file.createNewFile();
+                if(!createFile) {
+                    LOG.warning("Configuration file '%s' already exists, skipping.".formatted(name));
+                }
             } catch (IOException ex) {
-                throw new RuntimeException(String.format("could not create configuration file: '%s'", name), ex);
+                throw new RuntimeException("Could not create configuration file: '%s'".formatted(name), ex);
             }
         }
         this.config = YamlConfiguration.loadConfiguration(this.file);
@@ -42,7 +50,10 @@ public class ConfigurationTemplate {
         return this.config;
     }
 
-    public void loadDefaultConfig() {
+    public abstract void addDefaults();
+
+    private void loadDefaultConfig() {
+        this.addDefaults();
         this.config.options().copyDefaults(true);
         this.save();
     }

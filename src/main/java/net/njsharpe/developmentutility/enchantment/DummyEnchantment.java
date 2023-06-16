@@ -1,13 +1,18 @@
 package net.njsharpe.developmentutility.enchantment;
 
+import io.papermc.paper.enchantments.EnchantmentRarity;
+import net.kyori.adventure.text.Component;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
+import org.bukkit.entity.EntityCategory;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.Field;
+import java.util.Collections;
 import java.util.Optional;
+import java.util.Set;
 
 public class DummyEnchantment extends Enchantment {
 
@@ -15,8 +20,7 @@ public class DummyEnchantment extends Enchantment {
 
     public DummyEnchantment() {
         super(Optional.ofNullable(KEY).orElseThrow(() ->
-            new IllegalArgumentException("could not create key %s for enchantment".formatted(
-                    "%s:dummy".formatted(NamespacedKey.BUKKIT)))
+            new IllegalArgumentException("Could not create generic key for enchantment")
         ));
     }
 
@@ -62,18 +66,42 @@ public class DummyEnchantment extends Enchantment {
         return false;
     }
 
-    public static DummyEnchantment register() {
-        try {
-            Field field = Enchantment.class.getDeclaredField("acceptingNew");
-            field.setAccessible(true);
-            field.set(null, true);
-
-            DummyEnchantment enchantment = new DummyEnchantment();
-            if(Enchantment.getByKey(enchantment.getKey()) == null) Enchantment.registerEnchantment(enchantment);
-            return enchantment;
-        } catch (Exception ex) {
-            throw new RuntimeException("could not register enchantment", ex);
-        }
+    @Override
+    @NotNull
+    public Component displayName(int level) {
+        return Component.empty();
     }
 
+    @Override
+    public boolean isTradeable() {
+        return false;
+    }
+
+    @Override
+    public boolean isDiscoverable() {
+        return false;
+    }
+
+    @Override
+    @NotNull
+    public EnchantmentRarity getRarity() {
+        return EnchantmentRarity.COMMON;
+    }
+
+    @Override
+    public float getDamageIncrease(int level, @NotNull EntityCategory entityCategory) {
+        return 0;
+    }
+
+    @Override
+    @NotNull
+    public Set<EquipmentSlot> getActiveSlots() {
+        return Collections.emptySet();
+    }
+
+    @Override
+    @NotNull
+    public String translationKey() {
+        return "enchantment.%s.dummy".formatted(NamespacedKey.BUKKIT);
+    }
 }

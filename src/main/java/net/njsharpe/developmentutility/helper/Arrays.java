@@ -10,7 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class ArrayHelper {
+public class Arrays {
 
     @NotNull
     @SuppressWarnings("unchecked")

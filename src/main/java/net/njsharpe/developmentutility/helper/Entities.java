@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public class EntityHelper {
+public class Entities {
 
     @Nullable
     public static Player getNearestPlayer(@NotNull World world, double x, double y, double z, double radius,
@@ -30,8 +30,8 @@ public class EntityHelper {
         double d = -1.0D;
         Player player = null;
         for(Player p : world.getPlayers()) {
-            if(predicate != null && !predicate.test(p)) continue;;
-            double dist = EntityHelper.distanceToSqr(p, x, y, z);
+            if(predicate != null && !predicate.test(p)) continue;
+            double dist = Entities.distanceToSqr(p, x, y, z);
             if(!(radius < 0.0D) && !(dist < radius * radius) || d != -1.0D && !(dist < d)) continue;
             d = dist;
             player = p;
@@ -42,13 +42,13 @@ public class EntityHelper {
     @Nullable
     public static Player getNearestPlayer(@NotNull World world, Entity entity, double radius) {
         Location pos = entity.getLocation();
-        return EntityHelper.getNearestPlayer(world, pos.getX(), pos.getY(), pos.getZ(), radius, false);
+        return Entities.getNearestPlayer(world, pos.getX(), pos.getY(), pos.getZ(), radius, false);
     }
 
     @Nullable
     public static Player getNearestPlayer(@NotNull Location location, double radius) {
         if(location.getWorld() == null) return null;
-        return EntityHelper.getNearestPlayer(location.getWorld(), location.getX(), location.getY(), location.getZ(),
+        return Entities.getNearestPlayer(location.getWorld(), location.getX(), location.getY(), location.getZ(),
                 radius, false);
     }
 
@@ -56,10 +56,10 @@ public class EntityHelper {
     public static Player getNearestPlayer(@NotNull World world, double x, double y, double z, double radius,
                                           boolean includeHiddenPlayers) {
         Predicate<Entity> predicate = includeHiddenPlayers
-                ? entity -> (!(entity instanceof Player)) || !EntityHelper.isSpectator(entity)
+                ? entity -> (!(entity instanceof Player)) || !Entities.isSpectator(entity)
                 && !((Player) entity).getGameMode().equals(GameMode.CREATIVE)
-                : entity -> !EntityHelper.isSpectator(entity);
-        return EntityHelper.getNearestPlayer(world, x, y, z, radius, predicate);
+                : entity -> !Entities.isSpectator(entity);
+        return Entities.getNearestPlayer(world, x, y, z, radius, predicate);
     }
 
     public static boolean isSpectator(@NotNull Entity entity) {
@@ -77,12 +77,12 @@ public class EntityHelper {
 
     public static double distanceToSqr(@NotNull Entity entity, @NotNull Entity target) {
         Location pos = target.getLocation();
-        return EntityHelper.distanceToSqr(entity, pos.getX(), pos.getY(), pos.getZ());
+        return Entities.distanceToSqr(entity, pos.getX(), pos.getY(), pos.getZ());
     }
 
     public static double distanceTo(@NotNull Entity entity, @NotNull Entity target) {
         Location pos = target.getLocation();
-        return EntityHelper.distanceToSqr(entity, pos.getX(), pos.getY(), pos.getZ());
+        return Entities.distanceToSqr(entity, pos.getX(), pos.getY(), pos.getZ());
     }
 
     public static float getXRot(@NotNull Entity entity) {
@@ -108,7 +108,7 @@ public class EntityHelper {
         double x = pos.getX() + (random.nextDouble() - 0.5D) * distance;
         double y = pos.getY() + (double)(random.nextInt(16) - distance);
         double z = pos.getZ() + (random.nextDouble() - 0.5D) * distance;
-        return EntityHelper.teleport(entity, x, y, z, success);
+        return Entities.teleport(entity, x, y, z, success);
     }
 
     public static boolean teleport(@NotNull LivingEntity entity, double x, double y, double z,
@@ -123,7 +123,7 @@ public class EntityHelper {
             return false;
         }
         Location old = entity.getLocation();
-        boolean teleport = EntityHelper.randomTeleport(entity, x, y, z);
+        boolean teleport = Entities.randomTeleport(entity, x, y, z);
         if(teleport) {
             EntityTeleportEvent event = new EntityTeleportEvent(entity, old, pos);
             Bukkit.getServer().getPluginManager().callEvent(event);
@@ -155,7 +155,7 @@ public class EntityHelper {
             }
             if(ground) {
                 entity.teleport(location);
-                if(EntityHelper.noCollision(world, entity) && !EntityHelper.containsAnyLiquid(world,
+                if(Entities.noCollision(world, entity) && !Entities.containsAnyLiquid(world,
                         entity.getBoundingBox())) {
                     safe = true;
                 }
@@ -197,19 +197,19 @@ public class EntityHelper {
     }
 
     public static Vector getViewVector(@NotNull Entity entity, float f) {
-        return VectorHelper.calculateViewVector(EntityHelper.getViewXRot(entity, f), EntityHelper.getViewYRot(entity, f));
+        return Vectors.calculateViewVector(Entities.getViewXRot(entity, f), Entities.getViewYRot(entity, f));
     }
 
     public static float getViewXRot(@NotNull Entity entity, float f) {
         Location old = entity.getLocation();
-        if(f == 1.0F) return EntityHelper.getXRot(entity);
-        return Algebra.lerp(f, old.getYaw(), EntityHelper.getXRot(entity));
+        if(f == 1.0F) return Entities.getXRot(entity);
+        return Algebra.lerp(f, old.getYaw(), Entities.getXRot(entity));
     }
 
     public static float getViewYRot(@NotNull Entity entity, float f) {
         Location old = entity.getLocation();
-        if(f == 1.0F) return EntityHelper.getYRot(entity);
-        return Algebra.lerp(f, old.getPitch(), EntityHelper.getYRot(entity));
+        if(f == 1.0F) return Entities.getYRot(entity);
+        return Algebra.lerp(f, old.getPitch(), Entities.getYRot(entity));
     }
 
     public static void push(@NotNull LivingEntity entity, double x, double z) {
@@ -235,29 +235,29 @@ public class EntityHelper {
     }
 
     public static Entity getLookingAt(@NotNull LivingEntity entity, @Nullable Entity target, double radius) {
-        return EntityHelper.getLookingAt(entity, target, radius, false);
+        return Entities.getLookingAt(entity, target, radius, false);
     }
 
     public static Entity getLookingAt(@NotNull LivingEntity entity, @Nullable Entity target, double radius,
                                       boolean ignoreBlocks) {
-        return EntityHelper.getLookingAt(entity, radius, ignoreBlocks, e -> e.equals(target));
+        return Entities.getLookingAt(entity, radius, ignoreBlocks, e -> e.equals(target));
     }
 
     public static Entity getLookingAt(@NotNull LivingEntity entity, @NotNull EntityType type, double radius) {
-        return EntityHelper.getLookingAt(entity, type, radius, false);
+        return Entities.getLookingAt(entity, type, radius, false);
     }
 
     public static Entity getLookingAt(@NotNull LivingEntity entity, @NotNull EntityType type, double radius,
                                           boolean ignoreBlocks) {
-        return EntityHelper.getLookingAt(entity, radius, ignoreBlocks, e -> e.getType().equals(type));
+        return Entities.getLookingAt(entity, radius, ignoreBlocks, e -> e.getType().equals(type));
     }
 
     public static Entity getLookingAt(@NotNull LivingEntity entity, double radius) {
-        return EntityHelper.getLookingAt(entity, radius, false);
+        return Entities.getLookingAt(entity, radius, false);
     }
 
     public static Entity getLookingAt(@NotNull LivingEntity entity, double radius, boolean ignoreBlocks) {
-        return EntityHelper.getLookingAt(entity, radius, ignoreBlocks, e -> true);
+        return Entities.getLookingAt(entity, radius, ignoreBlocks, e -> true);
     }
 
     private static Entity getLookingAt(@NotNull LivingEntity entity, double radius, boolean ignoreBlocks,
@@ -274,9 +274,19 @@ public class EntityHelper {
         return result.getHitEntity();
     }
 
+    public static <T, U> boolean tryGet(@NotNull Entity entity, @NotNull NamespacedKey key,
+                                        @NotNull PersistentDataType<T, U> type, @NotNull AtomicReference<U> ref) {
+        PersistentDataContainer container = entity.getPersistentDataContainer();
+        if(container.has(key, type) && container.get(key, type) != null) {
+            ref.set(container.get(key, type));
+            return true;
+        }
+        return false;
+    }
+
     public static <T, U, V> boolean tryGet(@NotNull Entity entity, @NotNull NamespacedKey key,
-                                        @NotNull PersistentDataType<T, U> type, @NotNull AtomicReference<V> ref,
-                                        @NotNull Function<U, V> function) {
+                                           @NotNull PersistentDataType<T, U> type, @NotNull AtomicReference<V> ref,
+                                           @NotNull Function<U, V> function) {
         PersistentDataContainer container = entity.getPersistentDataContainer();
         if(container.has(key, type) && container.get(key, type) != null) {
             ref.set(function.apply(container.get(key, type)));

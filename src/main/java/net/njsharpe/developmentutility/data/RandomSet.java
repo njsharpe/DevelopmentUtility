@@ -1,6 +1,6 @@
 package net.njsharpe.developmentutility.data;
 
-import net.njsharpe.developmentutility.helper.RandomHelper;
+import net.njsharpe.developmentutility.helper.Randomizer;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -67,7 +67,7 @@ public class RandomSet<E> extends AbstractSet<E> {
     @Nullable
     public E random(@NotNull Random random) {
         if(this.data.isEmpty()) return null;
-        int index = RandomHelper.nextIntInclusive(random, 0, this.data.size() - 1);
+        int index = Randomizer.nextIntInclusive(random, 0, this.data.size() - 1);
         return this.removeAt(index);
     }
 

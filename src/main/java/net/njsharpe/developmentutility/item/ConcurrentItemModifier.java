@@ -1,8 +1,6 @@
 package net.njsharpe.developmentutility.item;
 
-import net.njsharpe.developmentutility.Format;
-import net.njsharpe.developmentutility.helper.StringHelper;
-import net.njsharpe.developmentutility.item.persistence.ObjectTagType;
+import net.kyori.adventure.text.Component;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
@@ -12,42 +10,39 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class ConcurrentItemModifier {
 
     private final ItemStack item;
     private final ItemMeta meta;
-    private List<String> lore;
+    private List<Component> lore;
 
     /***
-     * Unlike {@link AbstractItem.Builder}, this class will directly
-     * modify the specified item on each function call instead of being
-     * built all at once. Method functionality is effectively equivalent.
+     * This class will directly modify the specified item on each function
+     * call instead of being built all at once. Method functionality is
+     * effectively equivalent.
      *
      * @param item The {@link ItemStack} to modify
      */
     private ConcurrentItemModifier(ItemStack item) {
         this.item = item;
         if(item.getItemMeta() == null) {
-            throw new IllegalArgumentException("Item cannot be modified!");
+            throw new IllegalArgumentException("Item cannot be modified");
         }
         this.meta = item.getItemMeta();
-        this.lore = this.meta.getLore() == null ? new ArrayList<>() : this.meta.getLore();
+        this.lore = this.meta.lore() == null ? new ArrayList<>() : this.meta.lore();
     }
 
     public static ConcurrentItemModifier modify(@NotNull ItemStack item) {
         return new ConcurrentItemModifier(item);
     }
 
-    public ConcurrentItemModifier setName(String name) {
-        this.meta.setDisplayName(name);
+    public ConcurrentItemModifier setName(Component name) {
+        this.meta.displayName(name);
         this.item.setItemMeta(this.meta);
         return this;
     }
@@ -58,77 +53,69 @@ public class ConcurrentItemModifier {
         return this;
     }
 
-    public ConcurrentItemModifier appendLore(String line) {
+    public ConcurrentItemModifier appendLore(Component line) {
         this.lore.add(line);
-        this.meta.setLore(this.lore);
+        this.meta.lore(this.lore);
         this.item.setItemMeta(this.meta);
         return this;
     }
 
-    public ConcurrentItemModifier appendLore(String... lore) {
+    public ConcurrentItemModifier appendLore(Component... lore) {
         if(this.lore.isEmpty()) {
             return this.setLore(lore);
         }
         this.lore.addAll(Arrays.asList(lore));
-        this.meta.setLore(this.lore);
+        this.meta.lore(this.lore);
         this.item.setItemMeta(this.meta);
         return this;
     }
 
-    public ConcurrentItemModifier appendLore(Iterable<String> lore) {
+    public ConcurrentItemModifier appendLore(Iterable<Component> lore) {
         if(this.lore.isEmpty()) {
             return this.setLore(lore);
         }
         lore.forEach(this::appendLore);
-        this.meta.setLore(this.lore);
+        this.meta.lore(this.lore);
         this.item.setItemMeta(this.meta);
         return this;
     }
 
-    public ConcurrentItemModifier setLore(String lore, String delimiter) {
-        return this.setLore(Format.toList(lore, delimiter));
-    }
-
-    public ConcurrentItemModifier setLore(String... lore) {
+    public ConcurrentItemModifier setLore(Component... lore) {
         this.lore = new ArrayList<>(Arrays.asList(lore));
-        this.meta.setLore(this.lore);
+        this.meta.lore(this.lore);
         this.item.setItemMeta(this.meta);
         return this;
     }
 
-    public ConcurrentItemModifier setLore(Iterable<String> lore) {
-        List<String> list = new ArrayList<>();
+    public ConcurrentItemModifier setLore(Iterable<Component> lore) {
+        List<Component> list = new ArrayList<>();
         lore.iterator().forEachRemaining(list::add);
         this.lore = list;
-        this.meta.setLore(this.lore);
+        this.meta.lore(this.lore);
         this.item.setItemMeta(this.meta);
         return this;
     }
 
-    public ConcurrentItemModifier appendLoreAt(int index, String lore) {
+    public ConcurrentItemModifier appendLoreAt(int index, Component lore) {
         this.lore.add(index, lore);
-        this.meta.setLore(this.lore);
+        this.meta.lore(this.lore);
         this.item.setItemMeta(this.meta);
         return this;
     }
 
-    public ConcurrentItemModifier appendLoreAt(int index, Iterable<String> lore) {
+    public ConcurrentItemModifier appendLoreAt(int index, Iterable<Component> lore) {
         AtomicInteger atomic = new AtomicInteger(index);
         lore.forEach(line -> this.lore.add(atomic.getAndIncrement(), line));
-        this.meta.setLore(this.lore);
+        this.meta.lore(this.lore);
         this.item.setItemMeta(this.meta);
         return this;
     }
 
-    public ConcurrentItemModifier setLoreAt(int index, String lore, String delimiter) {
-        return this.setLoreAt(index, Format.toList(lore, delimiter));
-    }
-
-    public ConcurrentItemModifier setLoreAt(int index, Iterable<String> lore) {
-        List<String> list = new ArrayList<>();
+    public ConcurrentItemModifier setLoreAt(int index, Iterable<Component> lore) {
+        List<Component> list = new ArrayList<>();
         lore.iterator().forEachRemaining(list::add);
         this.lore.addAll(index, list);
-        this.meta.setLore(this.lore);
+        this.meta.lore(this.lore);
         this.item.setItemMeta(this.meta);
         return this;
     }

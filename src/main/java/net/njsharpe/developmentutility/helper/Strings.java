@@ -3,7 +3,7 @@ package net.njsharpe.developmentutility.helper;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 
-public class StringHelper {
+public class Strings {
 
     /***
      * Transforms the input {@link String} by removing the first and last characters
