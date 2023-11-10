@@ -30,7 +30,7 @@ publishing {
     }
     publications {
         maven(MavenPublication) {
-            groupId = project.groupId
+            groupId = project.group
             artifactId = rootProject.name
             version = project.version
             
