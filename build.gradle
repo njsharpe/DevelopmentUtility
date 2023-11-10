@@ -20,7 +20,7 @@ dependencies {
 publishing {
     repositories {
         maven {
-            name = "GitHub Packages"
+            name = "GitHubPackages"
             url = "https://maven.pkg.github.com/njsharpe/${rootProject.name}"
             credentials {
                 username = System.getenv("GITHUB_ACTOR")
