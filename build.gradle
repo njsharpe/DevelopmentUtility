@@ -2,18 +2,11 @@ plugins {
     id 'java'
     id 'idea'
     id 'io.papermc.paperweight.userdev' version '1.5.5'
+    id 'maven-publish'
 }
-
-sourceCompatibility = 17
-targetCompatibility = 17
 
 group 'net.njsharpe'
-version '1.0.0'
-
-jar {
-    archiveFileName = "${rootProject.name}.jar"
-    archiveVersion = null
-}
+version '1.0.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
@@ -22,4 +15,26 @@ repositories {
 dependencies {
     paperweight.paperDevBundle('1.19.4-R0.1-SNAPSHOT')
     implementation 'org.jetbrains:annotations:23.0.0'
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "GitHub Packages"
+            url = "https://maven.pkg.github.com/njsharpe/${rootProject.name}"
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+    publications {
+        maven(MavenPublication) {
+            groupId = project.groupId
+            artifactId = rootProject.name
+            version = project.version
+            
+            from components.java
+        }
+    }
 }
